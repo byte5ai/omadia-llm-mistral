@@ -4,7 +4,7 @@ identity:
   id: "@omadia/plugin-llm-mistral"
   name: "Mistral LLM Provider"
   version: "0.1.0"
-  kind: "provider"
+  kind: "extension"
   domain: "llm.provider.mistral"
   description: "Macht Mistral (Flagship Mistral Large 3) als admin-wählbaren, OpenAI-kompatiblen LLM-Provider in omadia verfügbar. Deklarativer Provider — wird aus diesem Manifest registriert, ohne Laufzeit-Provider-Code. EU-gehostet (Frankreich)."
   authors:

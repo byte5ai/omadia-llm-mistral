@@ -1,47 +1,50 @@
 # @omadia/plugin-llm-mistral
 
-Adds **Mistral** as an admin-selectable LLM provider for [omadia](https://github.com/byte5ai/omadia). Mistral exposes an OpenAI-compatible Chat Completions API, so this is a **declarative provider plugin**: the provider and its models are described in `manifest.yaml` and registered by the omadia kernel at load time — there is no runtime provider code to maintain. Mistral is **EU-hosted (France)**, which matters for data-protection / compliance requirements.
+Adds Mistral models (flagship Mistral Large 3) as an LLM you can assign to any agent in omadia. Mistral is hosted in the EU (France), so there is no third-country transfer for the prompt data.
 
-> Requires omadia core with the LLM-provider-plugin seam (the manifest-driven
-> `LlmProviderCatalog`). Older cores ignore the `llm_provider` manifest block.
+omadia is a self-hostable agentic OS: you build, run, and audit multi-agent AI teams from signed plugins, and you bring your own LLM key. Main repo: [byte5ai/omadia](https://github.com/byte5ai/omadia). This plugin makes Mistral one of the providers an operator can pick on the admin Providers page.
 
 ## Models
 
-| Model | Class | Context | Max output | Vision |
-|-------|-------|--------:|-----------:|:------:|
-| `mistral-large-latest` (Mistral Large 3) | frontier | 128,000 | 8,192 | yes |
-| `mistral-medium-latest` (Mistral Medium 3.5) | balanced | 128,000 | 8,192 | yes |
-| `mistral-small-latest` (Mistral Small 4) | fast | 128,000 | 8,192 | no |
+| Model | Class |
+|-------|-------|
+| Mistral Large 3 | frontier |
+| Mistral Medium 3.5 | balanced |
+| Mistral Small 4 | fast |
 
-One model per class, so no `class_default` is required.
+Agents request a class (`fast` / `balanced` / `frontier`). omadia resolves the class to the concrete model.
+
+## How it works in omadia
+
+This is a declarative provider, so it ships no runtime provider code. The `llm_provider` block in `manifest.yaml` (id, base URL, models, EU-hosting policy) is read by the omadia kernel when the plugin loads, before any agent activates, and registered into the kernel's provider catalog. Mistral uses the OpenAI-compatible Chat Completions API, so omadia's built-in OpenAI-compatible adapter drives the calls. The manifest flags the provider as EU-hosted, so the admin Providers page shows the matching data-protection note.
 
 ## Install
 
-1. Build the plugin: `npm install && npm run build` (produces `dist/plugin.js`).
-2. Package `manifest.yaml` + `dist/` and install it into omadia (admin → install plugin, or via the registry).
-3. On the admin **Providers** page, set the Mistral API key — it is stored in the vault under `provider:mistral/api_key` (same mechanism as the built-in OpenAI provider).
-4. Assign Mistral (and a model) to a plugin such as the orchestrator on the Providers page.
+Install from the omadia hub at [hub.omadia.ai](https://hub.omadia.ai) (omadia admin, plugins, install), or upload the built ZIP directly.
+
+After install:
+
+1. On the admin Providers page, paste your Mistral API key. It is stored encrypted under `provider:mistral/api_key`.
+2. Assign Mistral and a model to an agent.
 
 ## Configuration
 
 | Setup field | Required | Default | Notes |
 |-------------|:--------:|---------|-------|
-| `mistral_base_url` | no | `https://api.mistral.ai/v1` | Override only if you front Mistral with a gateway. |
+| `mistral_base_url` | no | `https://api.mistral.ai/v1` | Override for a Mistral-compatible gateway. |
 
-The API key is **not** a per-plugin setup secret — it is set centrally on the Providers page so the orchestrator (which reads the key from its own vault scope) can see it.
+The API key is set centrally on the Providers page, not as a per-plugin secret.
 
-## Wire format
-
-Mistral is OpenAI-compatible and needs **no quirks declaration**:
-
-- It uses the legacy `max_tokens` field — exactly what core's OpenAI-compatible adapter emits by default for a non-`openai` provider id. No field remap needed.
-- Standard `tool_choice` / `parallel_tool_calls` semantics, standard HTTP error signalling — nothing to override.
-
-## Development
+## Build from source
 
 ```bash
 npm install
-npm run typecheck   # tsc --noEmit (needs the omadia core contract built)
-npm test            # validates the manifest + model invariants
-npm run build
+npm run build   # tsc, emits dist/
+npm test        # validates manifest.yaml against core's invariants
 ```
+
+The plugin compiles against omadia workspace packages (`@omadia/plugin-api`, `@omadia/llm-provider`), declared as optional peer deps. Link them from a local omadia checkout before building. See [byte5ai/omadia](https://github.com/byte5ai/omadia).
+
+## License
+
+MIT, byte5 GmbH

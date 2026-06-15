@@ -1,0 +1,95 @@
+schema_version: "1"
+
+identity:
+  id: "@omadia/plugin-llm-mistral"
+  name: "Mistral LLM Provider"
+  version: "0.1.0"
+  kind: "provider"
+  domain: "llm.provider.mistral"
+  description: "Macht Mistral (Flagship Mistral Large 3) als admin-wählbaren, OpenAI-kompatiblen LLM-Provider in omadia verfügbar. Deklarativer Provider — wird aus diesem Manifest registriert, ohne Laufzeit-Provider-Code. EU-gehostet (Frankreich)."
+  authors:
+    - name: "byte5 GmbH"
+      email: "info@omadia.ai"
+      url: "https://omadia.ai"
+  license: "MIT"
+  categories:
+    - "llm-provider"
+    - "infrastructure"
+
+compat:
+  core: ">=1.0 <2.0"
+  node: ">=20"
+
+lifecycle:
+  entry: "dist/plugin.js"
+
+# Declarative LLM-provider contribution. The kernel reads this block at
+# manifest-load (before any plugin activates) and registers Mistral into the
+# LlmProviderCatalog + the dynamic model overlay. The API key is set centrally
+# on the admin Providers page (vault key `provider:mistral/api_key`), exactly
+# like the built-in OpenAI provider — NOT via per-plugin setup secrets, because
+# the orchestrator reads the key from its own (shared) vault scope.
+#
+# No `quirks` block: Mistral uses the legacy `max_tokens` field, which is
+# exactly what the openai-compatible adapter emits by default for a non-openai
+# provider id. Mistral is EU-hosted (France).
+llm_provider:
+  id: "mistral"
+  label: "Mistral"
+  wire_format: "openai-compatible"
+  default_base_url: "https://api.mistral.ai/v1"
+  base_url_config_key: "mistral_base_url"
+  models:
+    - id: "mistral:mistral-large-latest"
+      model_id: "mistral-large-latest"
+      label: "Mistral Large 3"
+      class: "frontier"
+      max_tokens: 8192
+      context_window: 128000
+      vision: true
+    - id: "mistral:mistral-medium-latest"
+      model_id: "mistral-medium-latest"
+      label: "Mistral Medium 3.5"
+      class: "balanced"
+      max_tokens: 8192
+      context_window: 128000
+      vision: true
+    - id: "mistral:mistral-small-latest"
+      model_id: "mistral-small-latest"
+      label: "Mistral Small 4"
+      class: "fast"
+      max_tokens: 8192
+      context_window: 128000
+      vision: false
+
+setup:
+  fields:
+    - key: "mistral_base_url"
+      type: "url"
+      label: "Mistral Base-URL"
+      help: "Standard: https://api.mistral.ai/v1 (EU-gehostet, Frankreich)"
+      required: false
+      default: "https://api.mistral.ai/v1"
+
+playbook:
+  when_to_use: |
+    Installiere diesen Provider, um Mistral-Modelle (Large 3 / Medium 3.5 /
+    Small 4) als Orchestrator-/Sub-Agent-/Verifier-LLM auszuwählen. Nach der
+    Installation den API-Key auf der Admin-Providers-Seite hinterlegen und
+    Mistral dem gewünschten Plugin (z.B. Orchestrator) zuweisen. EU-gehostet
+    (Frankreich) — relevant für Datenschutz-/Compliance-Anforderungen.
+
+permissions:
+  memory:
+    reads: []
+    writes: []
+  graph:
+    reads: []
+    writes: []
+  network:
+    outbound:
+      - "api.mistral.ai"
+  filesystem:
+    scratch: false
+
+integrations: []

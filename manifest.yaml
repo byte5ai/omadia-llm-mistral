@@ -3,7 +3,7 @@ schema_version: "1"
 identity:
   id: "@omadia/plugin-llm-mistral"
   name: "Mistral LLM Provider"
-  version: "0.1.0"
+  version: "0.2.0"
   kind: "extension"
   domain: "llm.provider.mistral"
   description: "Macht Mistral (Flagship Mistral Large 3) als admin-wählbaren, OpenAI-kompatiblen LLM-Provider in omadia verfügbar. Deklarativer Provider — wird aus diesem Manifest registriert, ohne Laufzeit-Provider-Code. EU-gehostet (Frankreich)."
@@ -39,6 +39,30 @@ llm_provider:
   wire_format: "openai-compatible"
   default_base_url: "https://api.mistral.ai/v1"
   base_url_config_key: "mistral_base_url"
+  # models is the offline seed; no discovery rule may name a version.
+  # Vendor -latest aliases roll forward, so only these three need confirmation.
+  discovery:
+    include:
+      - "^mistral-(large|medium|small)-latest$"
+    classify:
+      - match: "^mistral-large-"
+        class: "frontier"
+        label: "Mistral Large (latest)"
+        max_tokens: 8192
+        context_window: 128000
+        vision: true
+      - match: "^mistral-medium-"
+        class: "balanced"
+        label: "Mistral Medium (latest)"
+        max_tokens: 8192
+        context_window: 128000
+        vision: true
+      - match: "^mistral-small-"
+        class: "fast"
+        label: "Mistral Small (latest)"
+        max_tokens: 8192
+        context_window: 128000
+        vision: true
   models:
     - id: "mistral:mistral-large-latest"
       model_id: "mistral-large-latest"
@@ -60,7 +84,7 @@ llm_provider:
       class: "fast"
       max_tokens: 8192
       context_window: 128000
-      vision: false
+      vision: true
 
 setup:
   fields:

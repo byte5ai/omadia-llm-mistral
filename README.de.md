@@ -32,7 +32,7 @@ Agenten fragen eine Klasse an (`fast`, `balanced`, `frontier`). omadia bildet di
 
 ## So funktioniert es in omadia
 
-Ein deklaratives Provider-Plugin, es bringt also keinen Laufzeit-Code mit. Der omadia-Kernel liest beim Laden den `llm_provider`-Block aus `manifest.yaml` (id, Base-URL, Modelle), bevor ein Agent aktiviert wird, und registriert ihn im Provider-Katalog. Mistral spricht das OpenAI-kompatible Wire-Format, also fährt omadia es über den eingebauten OpenAI-kompatiblen Adapter. Das Manifest markiert den Provider als EU-gehostet, also zeigt die Admin-Providers-Seite den passenden Datenschutz-Hinweis.
+Ein Modell-Plugin (Kind `model`); nur das Modell-Gateway des Kernels ruft es auf. Es ist ein deklaratives Provider-Plugin, es bringt also keinen Laufzeit-Code mit. Der omadia-Kernel liest beim Laden den `llm_provider`-Block aus `manifest.yaml` (id, Base-URL, Modelle), bevor ein Agent aktiviert wird, und registriert ihn im Provider-Katalog. Mistral spricht das OpenAI-kompatible Wire-Format, also fährt omadia es über den eingebauten OpenAI-kompatiblen Adapter. Das Manifest markiert den Provider als EU-gehostet, also zeigt die Admin-Providers-Seite den passenden Datenschutz-Hinweis.
 
 ## Installation
 

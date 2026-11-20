@@ -115,6 +115,8 @@ permissions:
   network:
     outbound:
       - "api.mistral.ai"
+      # Operator-configured base URL (proxy/gateway/remote); the kernel allows its host.
+      - "$config.mistral_base_url"
   filesystem:
     scratch: false
 
